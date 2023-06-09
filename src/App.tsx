@@ -20,7 +20,9 @@ async function load(onReady: ServerReadyListener) {
 }
 
 async function updateFile(filecontent: string) {
-  await webContainerInstance.fs.writeFile("/index.js", filecontent, "utf-8");
+  if (webContainerInstance) {
+    await webContainerInstance.fs.writeFile("/index.js", filecontent, "utf-8");
+  }
 }
 
 export default function App() {

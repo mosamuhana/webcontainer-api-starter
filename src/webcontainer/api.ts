@@ -1,6 +1,6 @@
 import { WebContainer } from "@webcontainer/api";
 
-export let webContainerInstance!: WebContainer;
+export let webContainerInstance: WebContainer | undefined;
 
 export async function getWebContainerInstance() {
   if (!webContainerInstance) {

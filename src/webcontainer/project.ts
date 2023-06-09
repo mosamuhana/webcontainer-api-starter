@@ -1,5 +1,5 @@
 import { FileSystemTree, ServerReadyListener } from "@webcontainer/api";
-import { webContainerInstance } from "./api";
+import { getWebContainerInstance, webContainerInstance } from "./api";
 
 type EmitFn = (data: string) => void;
 
@@ -13,7 +13,7 @@ type Props = {
 async function installDependencies(props: Props) {
   const { onInstall } = props;
   onInstall?.('Install dependencies...');
-  const proc = await webContainerInstance.spawn("npm", ["install"]);
+  const proc = await webContainerInstance!.spawn("npm", ["install"]);
   if (onInstall) {
     proc.output.pipeTo(
       new WritableStream({
@@ -33,7 +33,7 @@ async function installDependencies(props: Props) {
 async function startDevServer(props: Props) {
   const { onStartServer, onReady } = props;
   onStartServer?.('Starting Dev Server...');
-  const proc = await webContainerInstance.spawn("npm", ["run", "start"]);
+  const proc = await webContainerInstance!.spawn("npm", ["run", "start"]);
   if (onStartServer) {
     proc.output.pipeTo(
       new WritableStream({
@@ -45,7 +45,7 @@ async function startDevServer(props: Props) {
     );
   }
 
-  webContainerInstance.on("server-ready", (port, url) => {
+  webContainerInstance!.on("server-ready", (port, url) => {
     onStartServer?.('Dev Server Ready.');
     onStartServer?.(`${url} ${port}`);
     onReady(port, url);
@@ -56,7 +56,7 @@ async function startDevServer(props: Props) {
 }
 
 export async function loadProject(props: Props) {
-  const wc = webContainerInstance;
+  const wc = await getWebContainerInstance();
   await wc.mount(props.files);
 
   const exitCode = await installDependencies(props);
